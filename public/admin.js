@@ -16,6 +16,13 @@ function adminHeaders() {
   return { "X-Admin-Password": adminPassword };
 }
 
+async function getConfiguredLiffId() {
+  const queryLiffId = new URLSearchParams(location.search).get("liffId");
+  if (queryLiffId) return queryLiffId;
+  const config = await fetch("/api/config").then((response) => response.json()).catch(() => ({}));
+  return config.liffId || "";
+}
+
 function toClosedDateInputValue(dateText) {
   const match = String(dateText).match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) return dateText;
@@ -212,6 +219,41 @@ async function setStatus(id, status) {
   await loadOrders();
 }
 
+async function getShopLineId() {
+  const result = document.querySelector("#settingsResult");
+  const target = document.querySelector("#shopLineUserId");
+  const showResult = (message) => {
+    result.textContent = message;
+    alert(message);
+  };
+
+  if (typeof liff === "undefined") {
+    showResult("LINE LIFF 載入失敗，請用 LIFF 網址重新開啟後台");
+    return;
+  }
+
+  const liffId = await getConfiguredLiffId();
+  if (!liffId) {
+    showResult("找不到 LIFF ID");
+    return;
+  }
+
+  try {
+    await liff.init({ liffId });
+    if (!liff.isLoggedIn()) {
+      liff.login({ redirectUri: location.href });
+      return;
+    }
+
+    const profile = await liff.getProfile();
+    target.value = profile.userId;
+    await navigator.clipboard.writeText(profile.userId).catch(() => {});
+    showResult(`店家 LINE 通知 ID：\n${profile.userId}\n\n已嘗試自動複製，可貼到 Render 的 SHOP_NOTIFY_LINE_USER_ID`);
+  } catch {
+    showResult("取得失敗，請確認後台網址是用 LIFF 開啟，或重新登入 LINE");
+  }
+}
+
 function printOrder(id) {
   const order = orders.find((item) => item.id === id);
   if (!order) return;
@@ -272,6 +314,8 @@ document.querySelector("#orders").addEventListener("click", (event) => {
 
 document.querySelector("#printTest").addEventListener("click", () => window.print());
 document.querySelector("#saveSettings").addEventListener("click", saveSettings);
+document.querySelector("#getShopLineId").addEventListener("click", getShopLineId);
+document.querySelector("#getShopLineIdTop").addEventListener("click", getShopLineId);
 
 if (adminPassword) {
   login(adminPassword);

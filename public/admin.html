@@ -25,6 +25,7 @@
             <p>接單、出單、完成訂單</p>
           </div>
           <div class="admin-actions">
+            <button type="button" id="getShopLineIdTop">取得 LINE ID</button>
             <button type="button" id="printTest">出單測試</button>
             <button type="button" id="logoutButton">登出</button>
             <a href="/">前台</a>
@@ -72,6 +73,13 @@
               <span>修改後台密碼</span>
               <input id="newAdminPassword" type="password" autocomplete="new-password" placeholder="留空代表不更改">
             </label>
+            <label class="field shop-line-id-field">
+              <span>店家 LINE 通知 ID</span>
+              <div class="inline-tool">
+                <input id="shopLineUserId" readonly placeholder="按右側按鈕取得">
+                <button type="button" id="getShopLineId">取得</button>
+              </div>
+            </label>
           </div>
 
           <h2>品項與價格</h2>
@@ -83,6 +91,7 @@
         </section>
       </section>
     </main>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script src="/admin.js"></script>
   </body>
 </html>

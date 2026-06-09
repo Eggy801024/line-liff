@@ -621,6 +621,26 @@ select {
   cursor: pointer;
 }
 
+.inline-tool {
+  display: grid;
+  grid-template-columns: 1fr 92px;
+  gap: 8px;
+}
+
+.inline-tool button {
+  min-height: 44px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.shop-line-id-field {
+  grid-column: 1 / -1;
+}
+
 .editor-list {
   display: grid;
   gap: 10px;
@@ -784,6 +804,10 @@ select {
   .admin-actions {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .inline-tool {
+    grid-template-columns: 1fr;
   }
 
   .order-main,
