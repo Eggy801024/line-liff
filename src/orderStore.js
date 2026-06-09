@@ -73,7 +73,19 @@ async function updateOrderStatus(id, status) {
   return order;
 }
 
+async function clearOrderHistory() {
+  await ensureStore();
+  const files = await fs.readdir(dataDir);
+  const backupFiles = files.filter((file) => /^orders-.*\.json$/i.test(file));
+  await writeOrders([]);
+  await Promise.all(
+    backupFiles.map((file) => fs.rm(path.join(dataDir, file), { force: true }))
+  );
+  return { cleared: true, deletedBackups: backupFiles.length };
+}
+
 module.exports = {
+  clearOrderHistory,
   createOrder,
   readOrders,
   updateOrderStatus

@@ -3,7 +3,7 @@ const fs = require("node:fs/promises");
 const path = require("node:path");
 const { URL } = require("node:url");
 const { normalizeItem } = require("./menu");
-const { createOrder, readOrders, updateOrderStatus } = require("./orderStore");
+const { clearOrderHistory, createOrder, readOrders, updateOrderStatus } = require("./orderStore");
 const { appendOrderToSheet, notifyCustomerOrderReady, notifyShop } = require("./integrations");
 const { readSettings, writeSettings } = require("./settingsStore");
 
@@ -96,6 +96,17 @@ async function handleApi(req, res, pathname) {
     if (!adminSettings) return;
     const orders = await readOrders();
     return sendJson(res, 200, orders);
+  }
+
+  if (req.method === "DELETE" && pathname === "/api/orders/history") {
+    try {
+      const adminSettings = await requireAdmin(req, res);
+      if (!adminSettings) return;
+      const result = await clearOrderHistory();
+      return sendJson(res, 200, result);
+    } catch (error) {
+      return sendJson(res, 400, { error: error.message });
+    }
   }
 
   if (req.method === "GET" && pathname === "/api/admin/settings") {

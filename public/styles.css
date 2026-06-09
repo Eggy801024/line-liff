@@ -612,6 +612,13 @@ select {
   margin: 0;
 }
 
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .settings-header button {
   border: 1px solid var(--accent);
   border-radius: 6px;
@@ -619,6 +626,11 @@ select {
   color: white;
   padding: 0 16px;
   cursor: pointer;
+}
+
+.settings-header .danger-btn {
+  border-color: #dc2626;
+  background: #dc2626;
 }
 
 .inline-tool {

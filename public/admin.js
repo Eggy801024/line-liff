@@ -219,6 +219,22 @@ async function setStatus(id, status) {
   await loadOrders();
 }
 
+async function clearOrderHistory() {
+  const confirmed = confirm("確定要清空全部歷史訂單嗎？已備份的訂單檔也會一起清除，這個動作不能復原。");
+  if (!confirmed) return;
+
+  const response = await fetch("/api/orders/history", {
+    method: "DELETE",
+    headers: adminHeaders()
+  });
+  if (response.status === 401) return handleUnauthorized();
+  const result = await response.json();
+  document.querySelector("#settingsResult").textContent = response.ok
+    ? `歷史訂單已清空，已清除 ${result.deletedBackups || 0} 個備份檔`
+    : result.error || "清空失敗";
+  await loadOrders();
+}
+
 async function getShopLineId() {
   const result = document.querySelector("#settingsResult");
   const target = document.querySelector("#shopLineUserId");
@@ -314,6 +330,7 @@ document.querySelector("#orders").addEventListener("click", (event) => {
 
 document.querySelector("#printTest").addEventListener("click", () => window.print());
 document.querySelector("#saveSettings").addEventListener("click", saveSettings);
+document.querySelector("#clearOrderHistory").addEventListener("click", clearOrderHistory);
 document.querySelector("#getShopLineId").addEventListener("click", getShopLineId);
 document.querySelector("#getShopLineIdTop").addEventListener("click", getShopLineId);
 
