@@ -1,0 +1,13 @@
+{
+  "name": "line-self-ordering-system",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LINE LIFF self-ordering app with a shop order dashboard.",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
