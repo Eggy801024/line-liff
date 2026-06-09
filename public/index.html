@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>熱氣球脆皮雞蛋糕 自助點餐</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  </head>
+  <body>
+    <div class="welcome-modal" id="welcomeModal" hidden>
+      <div class="welcome-dialog">
+        <p>親愛的客人您好~您點擊的是"熱氣球脆皮雞蛋糕-屏東大武店"的訂餐系統唷!祝您點餐愉快~</p>
+        <button type="button" id="welcomeClose">開始點餐</button>
+      </div>
+    </div>
+    <main class="customer-shell">
+      <section class="order-panel">
+        <header class="customer-header">
+          <div class="brand-lockup">
+            <img class="shop-logo" src="/logo.jpg" alt="熱氣球脆皮雞蛋糕 Logo">
+            <div>
+              <h1>熱氣球脆皮雞蛋糕</h1>
+              <p>LINE 自助點餐</p>
+            </div>
+          </div>
+        </header>
+
+        <form id="orderForm">
+          <section class="customer-fields">
+            <label class="field">
+              <span>姓名</span>
+              <input id="customerName" maxlength="24" placeholder="LINE 名稱或取餐姓名">
+            </label>
+            <label class="field">
+              <span>電話</span>
+              <input id="phone" inputmode="numeric" maxlength="10" minlength="10" pattern="[0-9]{10}" placeholder="請輸入 10 碼電話號碼" required>
+            </label>
+          </section>
+
+          <section class="customer-fields">
+            <label class="field">
+              <span>取餐日期</span>
+              <input id="pickupDate" type="hidden">
+              <button type="button" class="date-trigger" id="pickupDateTrigger">選擇取餐日期</button>
+              <div class="calendar-popover" id="calendarPopover" hidden>
+                <div class="calendar-header">
+                  <button type="button" id="prevMonth" aria-label="上一個月">‹</button>
+                  <strong id="calendarTitle"></strong>
+                  <button type="button" id="nextMonth" aria-label="下一個月">›</button>
+                </div>
+                <div class="calendar-weekdays">
+                  <span>週日</span>
+                  <span>週一</span>
+                  <span>週二</span>
+                  <span>週三</span>
+                  <span>週四</span>
+                  <span>週五</span>
+                  <span>週六</span>
+                </div>
+                <div class="calendar-grid" id="pickupDateGrid"></div>
+              </div>
+            </label>
+            <label class="field">
+              <span>取餐時間</span>
+              <select id="pickupTime"></select>
+            </label>
+          </section>
+
+          <section>
+            <h2>付款方式</h2>
+            <div class="payment-grid" id="paymentGrid"></div>
+          </section>
+
+          <section>
+            <h2>選擇點餐方式</h2>
+            <div class="type-grid" id="typeGrid"></div>
+          </section>
+
+          <section id="fillingSection">
+            <h2>選擇口味</h2>
+            <p class="section-help" id="fillingHelp"></p>
+            <div class="filling-grid" id="fillingGrid"></div>
+          </section>
+
+          <section class="field-row">
+            <h2>組數</h2>
+            <div class="stepper">
+              <button type="button" data-step="-1">-</button>
+              <output id="quantity">1</output>
+              <button type="button" data-step="1">+</button>
+            </div>
+          </section>
+
+          <label class="field">
+            <span>備註</span>
+            <textarea id="note" maxlength="80" placeholder="例如：少糖、先不要做、到店再取"></textarea>
+          </label>
+
+          <button type="button" class="add-btn" id="addItem">加入訂單</button>
+        </form>
+      </section>
+
+      <aside class="cart-panel">
+        <div class="cart-header">
+          <h2>目前訂單</h2>
+          <strong id="cartTotal">$0</strong>
+        </div>
+        <div id="cartList" class="cart-list empty">尚未加入餐點</div>
+        <button type="button" class="submit-btn" id="submitOrder">送出訂單</button>
+        <p class="result" id="result"></p>
+        <section class="history-panel">
+          <h2>再點一次</h2>
+          <div id="historyList" class="history-list empty">尚無歷史紀錄</div>
+        </section>
+      </aside>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
