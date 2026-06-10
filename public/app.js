@@ -1,7 +1,6 @@
 const state = {
   menu: null,
   selectedType: "plain",
-  selectedPayment: "",
   selectedPickupDate: "",
   calendarMonthOffset: 0,
   calendarOpen: false,
@@ -185,20 +184,6 @@ function renderTypes() {
   `).join("");
 }
 
-function renderPayments() {
-  const enabled = state.menu.paymentMethods.filter((item) => item.enabled);
-  if (!state.selectedPayment && enabled.length) {
-    state.selectedPayment = enabled[0].id;
-  }
-
-  document.querySelector("#paymentGrid").innerHTML = enabled.map((item) => `
-    <button type="button" class="choice payment ${item.id === state.selectedPayment ? "selected" : ""}" data-payment="${item.id}">
-      <span class="food-icon">💳</span>
-      <strong>${item.name}</strong>
-    </button>
-  `).join("");
-}
-
 function renderFillings() {
   const type = selectedType();
   const section = document.querySelector("#fillingSection");
@@ -326,12 +311,6 @@ function bindEvents() {
       renderFillings();
     }
 
-    const paymentButton = event.target.closest("[data-payment]");
-    if (paymentButton) {
-      state.selectedPayment = paymentButton.dataset.payment;
-      renderPayments();
-    }
-
     const pickupDateButton = event.target.closest("[data-pickup-date]");
     if (pickupDateButton && !pickupDateButton.disabled) {
       state.selectedPickupDate = pickupDateButton.dataset.pickupDate;
@@ -413,7 +392,6 @@ function bindEvents() {
         phone,
         pickupDate: document.querySelector("#pickupDate").value,
         pickupTime: document.querySelector("#pickupTime").value,
-        paymentMethodId: state.selectedPayment,
         note: document.querySelector("#note").value,
         items: state.cart
       })
@@ -442,7 +420,6 @@ async function boot() {
   renderPickupDates();
   renderPickupTimes();
   renderTypes();
-  renderPayments();
   renderFillings();
   renderQuantity();
   renderCart();

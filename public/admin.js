@@ -117,7 +117,6 @@ function renderOrders() {
       </div>
       <div class="order-items">
         <p><b>取餐</b> ${order.pickupDate || ""} ${order.pickupTime || ""}</p>
-        <p><b>付款</b> ${order.paymentMethod ? order.paymentMethod.name : "未填"}</p>
         <p><b>客人</b> ${order.customer.name} ${order.customer.phone ? ` / ${order.customer.phone}` : ""}</p>
         ${order.items.map((item) => `
           <p><b>${item.orderTypeName}</b> ${item.fillingSummary || item.fillingNames.join("、") || "原味"} x ${item.quantity} 組</p>
@@ -160,12 +159,6 @@ function renderSettings() {
     </article>
   `).join("");
 
-  document.querySelector("#paymentEditor").innerHTML = settings.paymentMethods.map((item, index) => `
-    <article class="editor-row payment-row">
-      <label>名稱<input data-payment-name="${index}" value="${item.name}"></label>
-      <label class="check"><input data-payment-enabled="${index}" type="checkbox" ${item.enabled ? "checked" : ""}> 啟用</label>
-    </article>
-  `).join("");
 }
 
 async function saveSettings() {
@@ -180,14 +173,6 @@ async function saveSettings() {
   document.querySelectorAll("[data-menu]").forEach((input) => {
     const item = settings.orderTypes[Number(input.dataset.menu)];
     item[input.dataset.key] = input.value;
-  });
-
-  document.querySelectorAll("[data-payment-name]").forEach((input) => {
-    settings.paymentMethods[Number(input.dataset.paymentName)].name = input.value;
-  });
-
-  document.querySelectorAll("[data-payment-enabled]").forEach((input) => {
-    settings.paymentMethods[Number(input.dataset.paymentEnabled)].enabled = input.checked;
   });
 
   const newPassword = document.querySelector("#newAdminPassword").value.trim();

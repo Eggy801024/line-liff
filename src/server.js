@@ -149,8 +149,10 @@ async function handleApi(req, res, pathname) {
         throw new Error("今天公休，先跟你說聲不好意思，請改選其他取餐日");
       }
 
-      const paymentMethod = settings.paymentMethods.find((item) => item.id === payload.paymentMethodId && item.enabled);
-      if (!paymentMethod) {
+      const paymentMethod = payload.paymentMethodId
+        ? settings.paymentMethods.find((item) => item.id === payload.paymentMethodId && item.enabled)
+        : null;
+      if (payload.paymentMethodId && !paymentMethod) {
         throw new Error("請選擇付款方式");
       }
 

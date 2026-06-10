@@ -1,19 +1,13 @@
-async function notifyShop(order) {
-  const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
-  const to = process.env.SHOP_NOTIFY_LINE_USER_ID;
-  if (!token || !to || typeof fetch !== "function") {
-    return { skipped: true, reason: "LINE notify env not configured" };
-  }
+function parseLineUserIds(value) {
+  return [...new Set(
+    String(value || "")
+      .split(/[\s,，、;；]+/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+  )];
+}
 
-  const text = [
-    `新訂單 #${order.number}`,
-    `金額 $${order.total}`,
-    order.pickupTime ? `取餐 ${order.pickupDate} ${order.pickupTime}` : "",
-    order.paymentMethod ? `付款 ${order.paymentMethod.name}` : "",
-    ...order.items.map((item) => `${item.orderTypeName} / ${item.fillingSummary || "原味"} x${item.quantity}組`),
-    order.note ? `備註：${order.note}` : ""
-  ].filter(Boolean).join("\n");
-
+async function pushLineMessage(token, to, text) {
   const response = await fetch("https://api.line.me/v2/bot/message/push", {
     method: "POST",
     headers: {
@@ -27,9 +21,34 @@ async function notifyShop(order) {
   });
 
   if (!response.ok) {
-    return { skipped: false, ok: false, status: response.status };
+    return { to, ok: false, status: response.status };
   }
-  return { skipped: false, ok: true };
+  return { to, ok: true };
+}
+
+async function notifyShop(order) {
+  const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+  const recipients = parseLineUserIds(process.env.SHOP_NOTIFY_LINE_USER_ID);
+  if (!token || recipients.length === 0 || typeof fetch !== "function") {
+    return { skipped: true, reason: "LINE notify env not configured" };
+  }
+
+  const text = [
+    `新訂單 #${order.number}`,
+    `金額 $${order.total}`,
+    order.pickupTime ? `取餐 ${order.pickupDate} ${order.pickupTime}` : "",
+    order.paymentMethod ? `付款 ${order.paymentMethod.name}` : "",
+    ...order.items.map((item) => `${item.orderTypeName} / ${item.fillingSummary || "原味"} x${item.quantity}組`),
+    order.note ? `備註：${order.note}` : ""
+  ].filter(Boolean).join("\n");
+
+  const results = await Promise.all(recipients.map((to) => pushLineMessage(token, to, text)));
+  return {
+    skipped: false,
+    ok: results.every((result) => result.ok),
+    sent: results.filter((result) => result.ok).length,
+    failed: results.filter((result) => !result.ok)
+  };
 }
 
 async function notifyCustomerOrderReady(order) {
@@ -46,17 +65,7 @@ async function notifyCustomerOrderReady(order) {
     "謝謝您，祝您用餐愉快。"
   ].filter(Boolean).join("\n");
 
-  const response = await fetch("https://api.line.me/v2/bot/message/push", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      to,
-      messages: [{ type: "text", text }]
-    })
-  });
+  const response = await pushLineMessage(token, to, text);
 
   if (!response.ok) {
     return { skipped: false, ok: false, status: response.status };
@@ -71,5 +80,6 @@ async function appendOrderToSheet() {
 module.exports = {
   appendOrderToSheet,
   notifyCustomerOrderReady,
-  notifyShop
+  notifyShop,
+  parseLineUserIds
 };
